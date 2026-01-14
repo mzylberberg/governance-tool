@@ -1,0 +1,28 @@
+﻿# === OS / Editor ===
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# === Python (backend) ===
+backend/.venv/
+backend/__pycache__/
+backend/*.pyc
+backend/.pytest_cache/
+backend/.mypy_cache/
+backend/.ruff_cache/
+backend/.env
+
+# === Node / React (frontend) ===
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+
+# === Logs ===
+*.log
+
+# === SQLite DB (we usually keep schema/seeds, not the live DB) ===
+backend/*.db
+backend/*.sqlite
+backend/*.sqlite3
