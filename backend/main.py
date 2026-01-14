@@ -1,15 +1,17 @@
 ﻿from enum import Enum
 from typing import List
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+from sqlalchemy.orm import Session
 
+from app.db.database import Base, SessionLocal, engine
+from app.models.translation import Translation
+from app.services.translator import Audience, translate_text
 
-class Audience(str, Enum):
-    it = "it"
-    executive = "executive"
-    pm = "pm"
+# Create tables on startup (MVP approach)
+Base.metadata.create_all(bind=engine)
 
 
 class TranslateRequest(BaseModel):
@@ -24,13 +26,23 @@ class TranslateResponse(BaseModel):
     recommended_actions: List[str]
 
 
+class HistoryItem(BaseModel):
+    id: int
+    audience: str
+    input_text: str
+    summary: str
+    risks: List[str]
+    recommended_actions: List[str]
+    created_at: str
+
+
 app = FastAPI(title="Governance Translator API")
 
-# CORS (safe defaults for local dev; we'll tighten later for deployment)
+# CORS (local dev)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173",  # Vite default
+        "http://localhost:5173",
         "http://127.0.0.1:5173",
     ],
     allow_credentials=True,
@@ -39,72 +51,59 @@ app.add_middleware(
 )
 
 
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
 @app.get("/health")
 def health():
     return {"status": "ok"}
 
 
-def translate_text(text: str, audience: Audience) -> TranslateResponse:
-    # Very simple starter logic: template-based translation
-    cleaned = " ".join(text.strip().split())
+@app.post("/translate", response_model=TranslateResponse)
+def translate(req: TranslateRequest, db: Session = Depends(get_db)):
+    result = translate_text(req.text, req.audience)
 
-    if audience == Audience.executive:
-        summary = (
-            "A technical issue was identified that could impact business operations. "
-            "We are assessing scope and taking steps to reduce risk and prevent disruption."
-        )
-        risks = [
-            "Potential service disruption or degraded performance",
-            "Increased security exposure if not remediated",
-            "Possible compliance/audit concerns depending on affected systems",
-        ]
-        actions = [
-            "Confirm scope, impacted systems, and severity",
-            "Apply recommended remediation and validate recovery",
-            "Document decision, risk acceptance (if any), and next review date",
-        ]
-    elif audience == Audience.pm:
-        summary = (
-            "A technical dependency/risk was found that may affect timeline and delivery. "
-            "We need a short remediation window and clear ownership to stay on track."
-        )
-        risks = [
-            "Schedule risk if remediation requires downtime or rework",
-            "Cross-team dependency risk (IT/Security/Engineering)",
-            "Quality risk if changes are rushed without validation",
-        ]
-        actions = [
-            "Create a tracked task with owner, due date, and acceptance criteria",
-            "Coordinate a maintenance window (if needed) and stakeholder comms",
-            "Add a validation step and rollback plan to the project plan",
-        ]
-    else:  # Audience.it
-        summary = (
-            "Technical finding received. Review indicators, confirm root cause, and implement remediation. "
-            "Ensure monitoring and documentation are updated."
-        )
-        risks = [
-            "Root cause may persist if remediation is incomplete",
-            "False positives/alert fatigue if tuning is not addressed",
-            "Configuration drift without change control",
-        ]
-        actions = [
-            "Validate the finding, reproduce if possible, and identify root cause",
-            "Implement remediation (patch/config change) and verify in logs/monitoring",
-            "Update runbook/ticket notes and add follow-up monitoring",
-        ]
+    # Save to SQLite
+    row = Translation(
+        audience=result["audience"].value,
+        input_text=req.text,
+        summary=result["summary"],
+        risks="\n".join(result["risks"]),
+        recommended_actions="\n".join(result["recommended_actions"]),
+    )
+    db.add(row)
+    db.commit()
+    db.refresh(row)
 
-    # Include a short “source” echo for traceability (helpful for portfolio demos)
-    summary = f"{summary}\n\nSource (condensed): {cleaned[:240]}{'...' if len(cleaned) > 240 else ''}"
+    return result
 
-    return TranslateResponse(
-        audience=audience,
-        summary=summary,
-        risks=risks,
-        recommended_actions=actions,
+
+@app.get("/history", response_model=List[HistoryItem])
+def history(limit: int = 10, db: Session = Depends(get_db)):
+    rows = (
+        db.query(Translation)
+        .order_by(Translation.created_at.desc())
+        .limit(limit)
+        .all()
     )
 
+    items: List[HistoryItem] = []
+    for r in rows:
+        items.append(
+            HistoryItem(
+                id=r.id,
+                audience=r.audience,
+                input_text=r.input_text,
+                summary=r.summary,
+                risks=r.risks.splitlines(),
+                recommended_actions=r.recommended_actions.splitlines(),
+                created_at=r.created_at.isoformat(),
+            )
+        )
+    return items
 
-@app.post("/translate", response_model=TranslateResponse)
-def translate(req: TranslateRequest):
-    return translate_text(req.text, req.audience)
