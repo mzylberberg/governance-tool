@@ -1,228 +1,85 @@
-📄 Product Requirements Document (PRD)
-Governance Translator Tool
-Author: Mya Zylberberg
+# Product Requirements Document (PRD)
+## Governance Translator Tool
 
-Status
+**Author:** Mya Zylberberg  
+**Status:** In Development  
+**Last Updated:** January 2026
 
-In Development (MVP complete; iterating toward portfolio-ready release)
+---
 
-Last Updated
+## 1. Product Overview
 
-January 2026
+### Problem Statement
+Technical cybersecurity and IT findings are often communicated in language that is:
+- overly technical for business stakeholders,
+- too abstract for project and program managers,
+- or not actionable across teams.
 
-1. Product Overview
-Problem Statement
+This misalignment creates delays, risk misinterpretation, and poor decision-making across IT, business leadership, and delivery teams.
 
-Technical security and IT findings are often communicated in language that is:
+### Solution
+The **Governance Translator Tool** translates technical cybersecurity or IT language into **audience-specific, governance-aligned communication**, producing structured outputs that support clear decision-making and accountability.
 
-too technical for business stakeholders,
+---
 
-too abstract for project managers,
+## 2. Goals and Success Criteria
 
-or not actionable across teams.
+### Primary Goals
+- Translate technical findings into stakeholder-appropriate language
+- Standardize governance-style outputs (risks, impacts, actions)
+- Provide traceability through saved translation history
+- Demonstrate backend, data, and product-thinking skills for portfolio review
 
-This creates misalignment between IT, business leadership, and delivery teams, increasing risk, delays, and misunderstanding.
+### Success Metrics (MVP)
+- API successfully translates text for all supported audiences
+- Swagger UI available and functional
+- Translations stored and retrievable from database
+- Clean, documented GitHub repository with reproducible setup
 
-Solution
+---
 
-The Governance Translator Tool translates technical cybersecurity or IT language into audience-specific, governance-aligned communication, enabling clearer decision-making across stakeholders.
+## 3. Target Users
 
-2. Goals & Success Criteria
-Primary Goals
+### Primary Personas
+1. **IT / Security Teams**
+   - Need structured outputs for tickets, audits, and incident reporting
 
-Translate technical findings into stakeholder-appropriate language
+2. **Executives / Business Stakeholders**
+   - Need concise summaries framed in risk and business impact
 
-Standardize governance-style outputs (risks, impact, actions)
+3. **Project / Program Managers**
+   - Need clarity on timeline impact, dependencies, and ownership
 
-Provide traceability through stored translation history
+---
 
-Serve as a portfolio demonstration of:
+## 4. In-Scope Features (MVP)
 
-backend API design
+### Backend (FastAPI)
+- `GET /health`
+- `POST /translate`
+  - Inputs:
+    - Technical text
+    - Target audience (`it`, `executive`, `pm`)
+  - Outputs:
+    - Summary
+    - Risks
+    - Recommended actions
+- `GET /history`
+  - Retrieve recent translations
 
-data persistence
+### Data Layer
+- SQLite database
+- Each translation record stores:
+  - Audience
+  - Input text
+  - Summary
+  - Risks
+  - Recommended actions
+  - Timestamp
 
-product thinking
-
-governance & risk communication
-
-Success Metrics (MVP)
-
-API successfully translates input for all supported audiences
-
-Swagger UI available and usable
-
-Translations stored and retrievable from database
-
-Clean, documented GitHub repo with clear setup instructions
-
-3. Target Users
-Primary Personas
-
-IT / Security Teams
-
-Need structured outputs for tickets, audits, and reporting
-
-Executives / Business Stakeholders
-
-Need high-level summaries and risk framing
-
-Project / Program Managers
-
-Need timeline, dependency, and ownership clarity
-
-4. In-Scope Features (MVP)
-Backend (FastAPI)
-
-GET /health
-
-POST /translate
-
-Inputs:
-
-technical text
-
-target audience (IT, Executive, PM)
-
-Outputs:
-
-summary
-
-risks
-
-recommended actions
-
-GET /history
-
-Retrieve recent translations
-
-Data Layer
-
-SQLite database
-
-Translation records include:
-
-audience
-
-input text
-
-translated summary
-
-risks
-
-actions
-
-timestamp
-
-Architecture
-
-Monorepo:
-
+### Architecture
+```text
 governance-tool/
   backend/
   frontend/
   docs/
-
-
-Python 3.13
-
-FastAPI + SQLAlchemy
-
-SQLite (local persistence)
-
-5. Out of Scope (for MVP)
-
-Authentication / user accounts
-
-Role-based access control
-
-Real-time collaboration
-
-External integrations (SIEM, ticketing tools)
-
-Advanced AI/LLM integrations (planned future enhancement)
-
-6. Functional Requirements
-FR-1: Translate Technical Text
-
-System must accept free-form technical input
-
-System must return structured translation based on selected audience
-
-FR-2: Persist Translations
-
-Every translation request must be saved to the database
-
-Records must be timestamped
-
-FR-3: Retrieve History
-
-System must return recent translations in reverse chronological order
-
-Limit parameter supported
-
-7. Non-Functional Requirements
-Performance
-
-API responses under 1 second for MVP workloads
-
-Reliability
-
-API should gracefully handle invalid input
-
-Validation errors returned clearly (HTTP 422)
-
-Maintainability
-
-Modular backend structure (services, models, db)
-
-Clear separation of concerns
-
-Security (Baseline)
-
-CORS configured for known frontend origins
-
-No secrets hard-coded in repo
-
-8. UX Requirements (Frontend – upcoming)
-
-Simple, minimal UI
-
-Clear audience selection
-
-Easy copy/paste of output
-
-Loading and error states
-
-9. Future Enhancements (Post-MVP)
-
-AI/LLM-based translation with prompt versioning
-
-Confidence scoring or risk severity ratings
-
-Export to PDF / Markdown
-
-Authentication + user history
-
-Deployment to cloud (Render + Vercel)
-
-Analytics on common risk themes
-
-10. Open Questions / Risks
-
-How to validate translation quality objectively?
-
-How much customization should be allowed per organization?
-
-How to balance explainability vs brevity for executives?
-
-11. Appendix
-Repository
-
-GitHub: <your repo link>
-
-Live Demo (planned)
-
-Frontend: Vercel
-
-Backend: Render/Fly.io
