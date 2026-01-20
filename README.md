@@ -2,6 +2,7 @@
 
 A portfolio project that translates technical cybersecurity/IT language into stakeholder-ready communication (IT, Executives, Project/Program teams), with structured outputs for risk, impact, and next actions.
 
+- 📄 [Product Requirements Document (PRD)](docs/PRD.md)
 ## Features (MVP)
 - Translate technical text into audience-specific language (IT / Executive / PM)
 - Structured output: summary, key risks, business impact, recommended actions
@@ -14,13 +15,14 @@ A portfolio project that translates technical cybersecurity/IT language into sta
 - Database: SQLite
 
 ## Monorepo Structure
-\\\
+```
 governance-tool/
   frontend/
   backend/
   docs/
   README.md
-\\\
+```
+
 
 ## Getting Started (Local)
 ### Backend
