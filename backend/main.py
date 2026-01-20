@@ -1,5 +1,4 @@
-﻿from enum import Enum
-from typing import List
+﻿from typing import List
 
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware

@@ -1,5 +1,5 @@
 ﻿from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.orm import declarative_base, sessionmaker
 
 # SQLite file will live in backend/app.db (ignored by git via .gitignore)
 DATABASE_URL = "sqlite:///./app.db"

@@ -50,8 +50,9 @@ def translate_text(text: str, audience: Audience) -> TranslationResult:
         ]
     else:  # Audience.it
         summary = (
-            "Technical finding received. Review indicators, confirm root cause, and implement remediation. "
-            "Ensure monitoring and documentation are updated."
+            "Technical finding received. Review indicators, confirm root cause, and "
+            "implement remediation. Ensure monitoring and documentation are updated."
+
         )
         risks = [
             "Root cause may persist if remediation is incomplete",
@@ -63,8 +64,9 @@ def translate_text(text: str, audience: Audience) -> TranslationResult:
             "Implement remediation (patch/config change) and verify in logs/monitoring",
             "Update runbook/ticket notes and add follow-up monitoring",
         ]
+    suffix = "..." if len(cleaned) > 240 else ""
+    summary = f"{summary}\n\nSource (condensed): {cleaned[:240]}{suffix}"
 
-    summary = f"{summary}\\n\\nSource (condensed): {cleaned[:240]}{'...' if len(cleaned) > 240 else ''}"
 
     return {
         "audience": audience,

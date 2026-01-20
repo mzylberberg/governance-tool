@@ -12,17 +12,21 @@ def test_health():
 
 
 def test_translate_executive():
-    payload = {
-        "text": "EDR detected suspicious PowerShell activity and blocked the process on two endpoints.",
-        "audience": "executive",
-    }
+    text = (
+        "EDR detected suspicious PowerShell activity and blocked the process "
+        "on two endpoints."
+    )
+    payload = {"text": text, "audience": "executive"}
+
     r = client.post("/translate", json=payload)
     assert r.status_code == 200
+
     data = r.json()
     assert data["audience"] == "executive"
-    assert "summary" in data and isinstance(data["summary"], str)
-    assert "risks" in data and isinstance(data["risks"], list)
-    assert "recommended_actions" in data and isinstance(data["recommended_actions"], list)
+    assert isinstance(data["summary"], str)
+    assert isinstance(data["risks"], list)
+    assert isinstance(data["recommended_actions"], list)
+
 
 
 def test_history_returns_list():
