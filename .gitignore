@@ -31,3 +31,8 @@ backend/*.sqlite3
 _pycache_/
 *.pyc
 
+
+# Python bytecode
+__pycache__/
+*.pyc
+
