@@ -26,3 +26,8 @@ frontend/.env.local
 backend/*.db
 backend/*.sqlite
 backend/*.sqlite3
+
+# Python bytecode
+_pycache_/
+*.pyc
+
