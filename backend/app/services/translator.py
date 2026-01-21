@@ -7,10 +7,17 @@ class Audience(str, Enum):
     executive = "executive"
     pm = "pm"
 
+class Confidence (str, Enum):
+    low = "low" 
+    medium = "medium"
+    high = "high"
 
 class TranslationResult(TypedDict):
     audience: Audience
     summary: str
+    impact: str
+    confidence : Confidence 
+    assumptions: List[str]
     risks: List[str]
     recommended_actions: List[str]
 
